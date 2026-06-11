@@ -1,0 +1,6 @@
+{
+  "name": "تنكيل حدود المجرة",
+  "description": "Desert Cyber-Odyssey environment where you pilot the Ares Spectre-X 3D fighter using drift mechanics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
