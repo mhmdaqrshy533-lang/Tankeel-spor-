@@ -54,7 +54,7 @@ const AppContent: React.FC = () => {
         handleUniformChange
     } = useAppContext();
 
-    const [appPhase, setAppPhase] = useState<'GATEWAY' | 'HOME' | 'GARAGE' | 'GAME'>('GATEWAY');
+    const [appPhase, setAppPhase] = useState<'HOME' | 'GARAGE' | 'GAME'>('HOME');
     const [isLanded, setIsLanded] = useState(false);
     const [isZoomed, setIsZoomed] = useState(false);
     const [activeLasers, setActiveLasers] = useState(0);
@@ -212,7 +212,6 @@ const AppContent: React.FC = () => {
 
     return (
         <div className="h-screen w-screen bg-gray-900 text-white flex flex-col overflow-hidden relative">
-            {appPhase === 'GATEWAY' && <Gateway onCompleted={() => setAppPhase('HOME')} />}
             {appPhase === 'HOME' && <HomeScreen onStart={() => setAppPhase('GAME')} onGarage={() => setAppPhase('GARAGE')} />}
             {appPhase === 'GARAGE' && <GarageScreen onBack={() => setAppPhase('HOME')} />}
             
@@ -246,7 +245,7 @@ const AppContent: React.FC = () => {
                     {(appPhase === 'GAME' || appPhase === 'HOME') && <ShipOverlay />}
                     {(appPhase === 'GAME' || appPhase === 'HOME') && (
                         <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%+4rem)] pointer-events-none opacity-40 mix-blend-color-dodge transition-all duration-500 ${isZoomed ? 'scale-75' : ''}`}>
-                            <span className="text-[#00F3FF] tracking-[1em] font-mono font-bold text-lg" style={{textShadow: '0 0 10px #00F3FF', perspective: '1000px', transform: 'rotateX(45deg)'}}>TANKEEL-1</span>
+                            <span className="text-[#00F3FF] tracking-[1em] font-mono font-bold text-lg" style={{textShadow: '0 0 10px #00F3FF', perspective: '1000px', transform: 'rotateX(45deg)'}}>STARFIRE</span>
                         </div>
                     )}
                 </div>

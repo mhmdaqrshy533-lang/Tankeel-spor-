@@ -12,10 +12,10 @@ export const HomeScreen: React.FC<{ onStart: () => void, onGarage: () => void }>
             <div className="relative z-10 flex flex-col items-center gap-8">
                 <h1 className="text-white text-6xl md:text-8xl font-mono font-bold tracking-[0.2em] uppercase text-center" 
                     style={{ textShadow: '0 0 20px rgba(0, 243, 255, 0.5), 0 0 40px rgba(0, 243, 255, 0.2)' }}>
-                    TANKEEL<span className="text-[#00F3FF]">-1</span>
+                    STAR<span className="text-[#00F3FF]">FIRE</span>
                 </h1>
                 
-                <p className="text-gray-400 font-mono tracking-widest text-lg uppercase">Cinematic Space Odyssey</p>
+                <p className="text-gray-400 font-mono tracking-widest text-lg uppercase text-center">Cinematic 3D Space Shooter</p>
 
                 <div className="flex flex-col md:flex-row gap-6 mt-12">
                     <button 
