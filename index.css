@@ -12,3 +12,23 @@
 .animate-fade-in-out {
     animation: fadeInOut 2.5s ease-in-out forwards;
 }
+
+/* Force Landscape for Mobile Devices */
+@media screen and (max-width: 1024px) and (orientation: portrait) {
+    #root {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vh;
+        height: 100vw;
+        transform: rotate(90deg);
+        transform-origin: top left;
+        overflow: hidden;
+    }
+    
+    /* Ensure child layers respect new bounds */
+    #root > div {
+        width: 100vh !important;
+        height: 100vw !important;
+    }
+}

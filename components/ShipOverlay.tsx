@@ -63,6 +63,8 @@ uniform vec3 u_drone1;
 uniform vec3 u_drone2;
 uniform float u_explosion1;
 uniform float u_explosion2;
+uniform float u_pilotOut;
+uniform float u_pilotFire;
 
 #define MAX_STEPS 64
 #define MAX_DIST 50.0
@@ -158,6 +160,19 @@ float map(vec3 p) {
         d = min(d, dDrone2);
     }
 
+    if (u_pilotOut > 0.0) {
+        // Simple pilot SDF (cylinder body, sphere head)
+        vec3 pPilot = p - vec3(2.0, -1.0, 0.0); // Stand to the right of the ship
+        float dBody = length(max(abs(vec2(pPilot.x, pPilot.z)) - vec2(0.3), 0.0)) + max(pPilot.y - 0.5, -pPilot.y - 1.0);
+        float dHead = length(pPilot - vec3(0.0, 0.7, 0.0)) - 0.3;
+        float dPilot = min(dBody, dHead);
+        // Animate arriving based on u_pilotOut smooth
+        if (u_pilotOut < 1.0) {
+             dPilot = max(dPilot, length(p) - u_pilotOut * 10.0);
+        }
+        d = min(d, dPilot);
+    }
+
     return d;
 }
 
@@ -194,10 +209,22 @@ void main() {
         float dDrone1 = u_drone1.z < 0.0 ? length(p - u_drone1) - 0.4 : 1e6;
         float dDrone2 = u_drone2.z < 0.0 ? length(p - u_drone2) - 0.4 : 1e6;
         
+        float dPilot = 1e6;
+        if (u_pilotOut > 0.0) {
+            vec3 pPilot = p - vec3(2.0, -1.0, 0.0);
+            float dBody = length(max(abs(vec2(pPilot.x, pPilot.z)) - vec2(0.3), 0.0)) + max(pPilot.y - 0.5, -pPilot.y - 1.0);
+            float dHead = length(pPilot - vec3(0.0, 0.7, 0.0)) - 0.3;
+            dPilot = min(dBody, dHead);
+        }
+
         vec3 col = vec3(0.0);
         float alpha = u_translucency;
 
-        if (dMis < 0.05) {
+        if (dPilot < 0.05) {
+            float diff = max(dot(n, l), 0.0);
+            col = vec3(0.7, 0.8, 0.9) * diff; // metallic advanced suit
+            col += vec3(0.0, 1.0, 0.4) * pow(1.0 - max(dot(-rd, n), 0.0), 3.0); // green neon edge
+        } else if (dMis < 0.05) {
             // Missile shading
             col = vec3(0.8, 0.8, 0.9);
             col += vec3(1.0, 0.2, 0.0) * smoothstep(0.1, -0.2, p.z - u_missile.z); // glowing tail
@@ -309,6 +336,22 @@ void main() {
         outColor.rgb += vec3(1.0, 0.5, 0.1) * eIntensity * 2.0;
         outColor.a = max(outColor.a, eIntensity);
     }
+
+    // Pilot Fire Laser
+    if (u_pilotFire > 0.0) {
+       vec3 startPilot = vec3(2.0, 0.0, 0.0);
+       vec3 dir = normalize(u_drone1 - startPilot);
+       vec3 pRay = ro + rd * length(startPilot - ro);
+       float tProj = dot(pRay - startPilot, dir);
+       if (tProj > 0.0 && tProj < length(u_drone1 - startPilot)) {
+           float projDist = length((pRay - startPilot) - dir * tProj);
+           if (projDist < 0.2) {
+               float lI = smoothstep(0.2, 0.0, projDist) * u_pilotFire;
+               outColor.rgb += vec3(0.0, 1.0, 0.5) * lI * 2.0;
+               outColor.a = max(outColor.a, lI);
+           }
+       }
+    }
 }
 `;
 
@@ -335,9 +378,12 @@ const mat4 = {
 };
 
 export const ShipOverlay: React.FC = () => {
-    const { viewMode, pressedKeys, controlConfig, effectiveShipConfigRef, cameraAngularVelocityRef, shipConfig } = useAppContext();
+    const { viewMode, pressedKeys, controlConfig, effectiveShipConfigRef, cameraAngularVelocityRef, shipConfig, allUniforms } = useAppContext();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const shipState = useRef({ pitch: 0, yaw: 0, roll: 0 });
+
+    const allUniformsRef = useRef(allUniforms);
+    useEffect(() => { allUniformsRef.current = allUniforms; }, [allUniforms]);
 
     const shipConfigRef = useRef(shipConfig);
     useEffect(() => { shipConfigRef.current = shipConfig; }, [shipConfig]);
@@ -422,7 +468,9 @@ export const ShipOverlay: React.FC = () => {
             uDrone1: gl.getUniformLocation(p, 'u_drone1'),
             uDrone2: gl.getUniformLocation(p, 'u_drone2'),
             uExplosion1: gl.getUniformLocation(p, 'u_explosion1'),
-            uExplosion2: gl.getUniformLocation(p, 'u_explosion2')
+            uExplosion2: gl.getUniformLocation(p, 'u_explosion2'),
+            uPilotOut: gl.getUniformLocation(p, 'u_pilotOut'),
+            uPilotFire: gl.getUniformLocation(p, 'u_pilotFire')
         };
 
         // Fullscreen quad
@@ -509,6 +557,19 @@ export const ShipOverlay: React.FC = () => {
             cs.drone1[2] += 10.0 * dt;
             cs.drone2[2] += 12.0 * dt;
 
+            // Pilot logic
+            const isPilotActive = (allUniformsRef.current['slider_pilot'] || 0) > 0.5;
+            let pilotOutVal = 0.0;
+            let pilotFireVal = 0.0;
+            if (isPilotActive) {
+                pilotOutVal = 1.0;
+                // Auto fire at drones if close
+                if (cs.drone1[2] > -20.0 && cs.drone1[2] < 5.0) {
+                    pilotFireVal = Math.sin(currentTimeSec * 20.0) > 0 ? 1.0 : 0.0;
+                    if (Math.random() < 0.1) cs.explosion1 = 1.0;
+                }
+            }
+
             if (cs.missileActive) {
                 cs.missileVelocity += cs.missileVelocity * 3.0 * dt; // Exponential acceleration
                 cs.missile[2] -= cs.missileVelocity * dt;
@@ -573,6 +634,8 @@ export const ShipOverlay: React.FC = () => {
             gl.uniform3fv(locs.uDrone2, cs.drone2);
             gl.uniform1f(locs.uExplosion1, cs.explosion1);
             gl.uniform1f(locs.uExplosion2, cs.explosion2);
+            gl.uniform1f(locs.uPilotOut, pilotOutVal);
+            gl.uniform1f(locs.uPilotFire, pilotFireVal);
 
             // Update DNA uniforms from EFFECTIVE config (includes modulations)
             const ec = effectiveShipConfigRef.current;

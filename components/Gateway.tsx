@@ -7,7 +7,7 @@ const VALID_CODES = [
     "ALPHA-CODE-11"
 ];
 
-export const Gateway: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const Gateway: React.FC<{ onCompleted: () => void }> = ({ onCompleted }) => {
     const [activationState, setActivationState] = useState<'UNACTIVATED' | 'STAGE1' | 'STAGE2' | 'ACTIVE'>('UNACTIVATED');
     const [inputCode, setInputCode] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -28,10 +28,11 @@ export const Gateway: React.FC<{ children: React.ReactNode }> = ({ children }) =
         } else if (activationState === 'STAGE2') {
             const t2 = setTimeout(() => {
                 setActivationState('ACTIVE');
+                onCompleted();
             }, 2500);
             return () => clearTimeout(t2);
         }
-    }, [activationState]);
+    }, [activationState, onCompleted]);
 
     const handleActivate = () => {
         if (VALID_CODES.includes(inputCode) || inputCode === '1234') { // Fallback code for testing if needed
@@ -45,7 +46,7 @@ export const Gateway: React.FC<{ children: React.ReactNode }> = ({ children }) =
     };
 
     if (activationState === 'ACTIVE') {
-        return <>{children}</>;
+        return null;
     }
 
     return (
