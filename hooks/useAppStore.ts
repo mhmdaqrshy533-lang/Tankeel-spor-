@@ -1190,13 +1190,18 @@ export const useAppStore = (): Omit<AppContextType, keyof ReturnType<typeof useD
         const rightX = Math.cos(y);
         const rightZ = -Math.sin(y);
 
-        const tVX = (dirX * fwd * (controls.forwardVelocity??1) + rightX * str * (controls.strafeVelocity??1)) * spd;
-        const tVY = (dirY * fwd * (controls.forwardVelocity??1) + asc * (controls.ascendVelocity??1)) * spd;
-        const tVZ = (dirZ * fwd * (controls.forwardVelocity??1) + rightZ * str * (controls.strafeVelocity??1)) * spd;
+        const thrustSpeed = 20.0;
+        const drag = 0.99; // Newtonian inertia effect - retains velocity
 
-        cameraVelocityRef.current[0] += (tVX - cameraVelocityRef.current[0]) * 0.1;
-        cameraVelocityRef.current[1] += (tVY - cameraVelocityRef.current[1]) * 0.1;
-        cameraVelocityRef.current[2] += (tVZ - cameraVelocityRef.current[2]) * 0.1;
+        // Apply acceleration to current velocity (F = ma)
+        cameraVelocityRef.current[0] += (dirX * fwd * (controls.forwardVelocity ?? 1) + rightX * str * (controls.strafeVelocity ?? 1)) * thrustSpeed * dt;
+        cameraVelocityRef.current[1] += (dirY * fwd * (controls.forwardVelocity ?? 1) + asc * (controls.ascendVelocity ?? 1)) * thrustSpeed * dt;
+        cameraVelocityRef.current[2] += (dirZ * fwd * (controls.forwardVelocity ?? 1) + rightZ * str * (controls.strafeVelocity ?? 1)) * thrustSpeed * dt;
+        
+        // Apply Drag (simulating some dampening or vacuum drag)
+        cameraVelocityRef.current[0] *= drag;
+        cameraVelocityRef.current[1] *= drag;
+        cameraVelocityRef.current[2] *= drag;
         
         // OPTIMIZATION: Reuse temp array for proposed position instead of creating new one
         const proposedPos = tempProposedPosRef.current;

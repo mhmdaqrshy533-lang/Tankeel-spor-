@@ -47,7 +47,7 @@ const DpadButton: React.FC<{
     <div
       role="button"
       aria-label={ariaLabel}
-      className={`w-10 h-10 sm:w-14 sm:h-14 bg-gray-500/30 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white transition-transform duration-100 ease-in-out select-none touch-none ${className} ${isVisuallyPressed ? 'bg-white/40 scale-90' : ''}`}
+      className={`w-10 h-10 sm:w-14 sm:h-14 bg-black/70 backdrop-blur-md border border-[#00F3FF]/40 rounded-none flex items-center justify-center text-[#00F3FF] transition-transform duration-100 ease-in-out select-none touch-none ${className} ${isVisuallyPressed ? 'bg-[#00F3FF]/20 border-[#00F3FF] scale-95 shadow-[0_0_15px_rgba(0,243,255,0.4)]' : ''}`}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUpOrCancel}
       onPointerCancel={handlePointerUpOrCancel}
@@ -92,15 +92,15 @@ const TerraformButton: React.FC<{
   const isDepleted = power <= 0.01;
   const fillHeight = `${Math.min(1, power) * 100}%`;
 
-  const fillColor = isFull ? 'bg-cyan-400/50' : 'bg-white/40';
-  const iconColor = isFull ? 'text-cyan-300' : 'text-white';
+  const fillColor = isFull ? 'bg-[#00F3FF]/50' : 'bg-[#00F3FF]/20';
+  const iconColor = isFull ? 'text-[#00F3FF]' : 'text-[#00F3FF]/50';
 
   return (
     <div
       role="button"
       aria-label="Terraform Fractal"
       title="Terraform"
-      className={`w-16 h-16 sm:w-20 sm:h-20 bg-gray-500/30 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white transition-all duration-150 ease-in-out select-none touch-none transform relative overflow-hidden ${isPointerPressed ? 'scale-95' : ''} ${isDepleted && !isPointerPressed ? 'opacity-70' : ''}`}
+      className={`w-16 h-16 sm:w-20 sm:h-20 bg-black/70 backdrop-blur-md border border-[#00F3FF]/40 rounded-none flex items-center justify-center text-white transition-all duration-150 ease-in-out select-none touch-none transform relative overflow-hidden ${isPointerPressed ? 'scale-95 border-[#00F3FF] shadow-[0_0_15px_rgba(0,243,255,0.4)]' : ''} ${isDepleted && !isPointerPressed ? 'opacity-70' : ''}`}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUpOrCancel}
       onPointerCancel={handlePointerUpOrCancel}
@@ -142,8 +142,8 @@ export const DpadControls: React.FC = () => {
           </div>
         </div>
         <div className="flex flex-col gap-2 h-28 sm:h-40 justify-center pb-1 sm:pb-2">
-          <DpadButton onPress={() => pressKey('shift')} onRelease={() => releaseKey('shift')} ariaLabel="Move Down" className="!w-10 !h-16 sm:!w-12 sm:!h-20 !rounded-xl" isKeyPressed={pressedKeys.has('shift')}><ChevronUpIcon className="w-5 h-5 sm:w-7 sm:h-7" /></DpadButton>
-          <DpadButton onPress={() => pressKey(' ')} onRelease={() => releaseKey(' ')} ariaLabel="Move Up" className="!w-10 !h-16 sm:!w-12 sm:!h-20 !rounded-xl" isKeyPressed={pressedKeys.has(' ')}><ChevronDownIcon className="w-5 h-5 sm:w-7 sm:h-7" /></DpadButton>
+          <DpadButton onPress={() => pressKey('shift')} onRelease={() => releaseKey('shift')} ariaLabel="Move Down" className="!w-10 !h-16 sm:!w-12 sm:!h-20" isKeyPressed={pressedKeys.has('shift')}><ChevronUpIcon className="w-5 h-5 sm:w-7 sm:h-7" /></DpadButton>
+          <DpadButton onPress={() => pressKey(' ')} onRelease={() => releaseKey(' ')} ariaLabel="Move Up" className="!w-10 !h-16 sm:!w-12 sm:!h-20" isKeyPressed={pressedKeys.has(' ')}><ChevronDownIcon className="w-5 h-5 sm:w-7 sm:h-7" /></DpadButton>
         </div>
       </div>
       

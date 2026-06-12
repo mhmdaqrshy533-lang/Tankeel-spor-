@@ -244,8 +244,8 @@ const AppContent: React.FC = () => {
                     )}
                     {(appPhase === 'GAME' || appPhase === 'HOME') && <ShipOverlay />}
                     {(appPhase === 'GAME' || appPhase === 'HOME') && (
-                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%+4rem)] pointer-events-none opacity-40 mix-blend-color-dodge transition-all duration-500 ${isZoomed ? 'scale-75' : ''}`}>
-                            <span className="text-[#00F3FF] tracking-[1em] font-mono font-bold text-lg" style={{textShadow: '0 0 10px #00F3FF', perspective: '1000px', transform: 'rotateX(45deg)'}}>SGRD</span>
+                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%+4rem)] pointer-events-none opacity-50 mix-blend-screen transition-all duration-500 ${isZoomed ? 'scale-75' : ''}`}>
+                            <span className="text-[#00F3FF] tracking-[2em] font-mono font-bold text-2xl uppercase" style={{ textShadow: '0 0 15px #00F3FF' }}>SGRD</span>
                         </div>
                     )}
                 </div>
@@ -257,87 +257,105 @@ const AppContent: React.FC = () => {
                 <ControlsPanel />
                 {cameraControlsEnabled && <DpadControls />}
                 
-                <div className="fixed top-4 left-4 z-30 flex flex-col gap-2">
-                    <button
-                        onClick={() => setIsHdEnabled(!isHdEnabled)}
-                        className={`w-12 h-12 flex items-center justify-center rounded-full transition-all transform hover:scale-110 shadow-lg border backdrop-blur-sm
-                                    ${isHdEnabled ? 'bg-white/90 text-black border-gray-300' : 'bg-gray-500/30 text-white border-white/20'}`}
-                    >
-                        <span className="font-bold text-sm">HD</span>
-                    </button>
-                    
-                     {cameraControlsEnabled && SHOW_HUD_BUTTON && (
+                {/* STRICT 3x3 UI GRID OVERLAY */}
+                <div className="fixed inset-0 z-50 pointer-events-none p-5 grid grid-cols-3 grid-rows-3 gap-4">
+                    {/* TOP LEFT: Utilities */}
+                    <div className="flex flex-col gap-3 items-start justify-start pointer-events-auto">
                         <button
-                            onClick={toggleViewMode}
-                            className={`w-12 h-12 flex items-center justify-center rounded-full transition-all transform hover:scale-110 shadow-lg border backdrop-blur-sm
-                                        ${viewMode === 'chase' ? 'bg-white/90 text-black border-gray-300' : 'bg-gray-500/30 text-white border-white/20'}`}
+                            onClick={() => setIsHdEnabled(!isHdEnabled)}
+                            className={`w-12 h-12 flex items-center justify-center transition-all bg-black/70 backdrop-blur-md rounded-none border-2
+                                        ${isHdEnabled ? 'text-[#00FF66] border-[#00FF66]' : 'text-gray-400 border-gray-600 hover:border-gray-400'}`}
                         >
-                           <RocketLaunchIcon className="w-6 h-6" />
+                            <span className="font-bold text-sm">HD</span>
                         </button>
-                    )}
-                </div>
+                        
+                         {cameraControlsEnabled && SHOW_HUD_BUTTON && (
+                            <button
+                                onClick={toggleViewMode}
+                                className={`w-12 h-12 flex items-center justify-center transition-all bg-black/70 backdrop-blur-md rounded-none border-2
+                                            ${viewMode === 'chase' ? 'text-[#00F3FF] border-[#00F3FF]' : 'text-gray-400 border-gray-600 hover:border-gray-400'}`}
+                            >
+                               <RocketLaunchIcon className="w-6 h-6" />
+                            </button>
+                        )}
+                    </div>
 
-                <div className="fixed top-4 right-4 z-30 flex flex-col gap-2">
-                    {SHOW_SETTINGS_BUTTON && (
-                        <button
-                            onClick={() => setIsControlsOpen(true)}
-                            className="w-12 h-12 flex items-center justify-center bg-gray-500/30 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/20 transition-all transform hover:scale-110 shadow-lg"
-                        >
-                            <GearIcon className="w-6 h-6" />
+                    {/* TOP CENTER: Zoom Toggle */}
+                    <div className="flex items-start justify-center pointer-events-auto">
+                        <button 
+                            onClick={() => setIsZoomed(!isZoomed)}
+                            className={`w-14 h-14 flex items-center justify-center transition-all duration-300 bg-black/70 backdrop-blur-md rounded-none border-2 ${isZoomed ? 'border-[#00F3FF] text-[#00F3FF] scale-110 shadow-[0_0_15px_rgba(0,243,255,0.5)]' : 'border-gray-600 text-gray-400 hover:border-gray-400'}`}>
+                            <Search className="w-6 h-6" />
                         </button>
-                    )}
+                    </div>
 
-                    {SHOW_MUTE_BUTTON && (
-                        <button
-                            onClick={handleVolumeToggle}
-                            className={`w-12 h-12 flex items-center justify-center rounded-full transition-all transform hover:scale-110 shadow-lg border backdrop-blur-sm
-                                        ${soundConfig.enabled ? 'bg-white/90 text-black border-gray-300' : 'bg-gray-500/30 text-white border-white/20'}`}
-                        >
-                            {getVolumeIcon()}
-                        </button>
-                    )}
-                </div>
+                    {/* TOP RIGHT: Settings & Volume */}
+                    <div className="flex flex-col gap-3 items-end justify-start pointer-events-auto">
+                        {SHOW_SETTINGS_BUTTON && (
+                            <button
+                                onClick={() => setIsControlsOpen(true)}
+                                className="w-12 h-12 flex items-center justify-center transition-all bg-black/70 backdrop-blur-md rounded-none border-2 border-gray-600 text-gray-400 hover:text-white hover:border-gray-400"
+                            >
+                                <GearIcon className="w-6 h-6" />
+                            </button>
+                        )}
 
-                <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-4 items-end">
-                    <button 
-                        onPointerDown={() => pressKey(' ')} 
-                        onPointerUp={() => releaseKey(' ')} 
-                        className="w-16 h-16 flex items-center justify-center bg-red-600/80 rounded-full text-white backdrop-blur shadow-[0_0_20px_rgba(255,0,0,0.5)] border-2 border-red-400 transform active:scale-95 transition-all">
-                        <Flame className="w-8 h-8" />
-                    </button>
-                    <div className="flex gap-4">
+                        {SHOW_MUTE_BUTTON && (
+                            <button
+                                onClick={handleVolumeToggle}
+                                className={`w-12 h-12 flex items-center justify-center transition-all bg-black/70 backdrop-blur-md rounded-none border-2
+                                            ${soundConfig.enabled ? 'text-[#00F3FF] border-[#00F3FF]' : 'text-gray-400 border-gray-600'}`}
+                            >
+                                {getVolumeIcon()}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* MIDDLE LEFT: Data (if HUDOverlay component is removed, otherwise it handles it) */}
+                    <div className="flex items-center justify-start pointer-events-none"></div>
+
+                    {/* MIDDLE CENTER: Crosshair / Compass (managed by HUDOverlay) */}
+                    <div className="flex items-center justify-center pointer-events-none"></div>
+
+                    {/* MIDDLE RIGHT: Additional HUD Data */}
+                    <div className="flex items-center justify-end pointer-events-none"></div>
+
+                    {/* BOTTOM LEFT: State Management (Aircraft) */}
+                    <div className="flex flex-col items-start justify-end pointer-events-auto">
+                        {isLanded && (
+                            <button 
+                                onClick={exitAircraft}
+                                className="px-6 py-3 bg-black/70 rounded-none text-[#00F3FF] font-bold font-mono backdrop-blur-md border-2 border-[#00F3FF] shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_25px_rgba(0,243,255,0.5)] flex items-center gap-2 transform active:scale-95 transition-all uppercase tracking-wider">
+                                <LogOut className="w-5 h-5" />
+                                {allUniforms['slider_pilot'] > 0.5 ? 'Enter Aircraft' : 'Exit Aircraft'}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* BOTTOM CENTER: Empty to preserve view */}
+                    <div className="flex items-end justify-center pointer-events-none"></div>
+
+                    {/* BOTTOM RIGHT: Actions */}
+                    <div className="flex gap-4 items-end justify-end pointer-events-auto">
                         <button 
                             onPointerDown={() => pressKey('m')} 
                             onPointerUp={() => releaseKey('m')} 
-                            className="w-16 h-16 flex items-center justify-center bg-blue-600/80 rounded-full text-white backdrop-blur shadow-[0_0_20px_rgba(0,100,255,0.5)] border-2 border-blue-400 transform active:scale-95 transition-all">
+                            className="w-16 h-16 flex items-center justify-center bg-black/70 rounded-none text-[#00F3FF] backdrop-blur-md border-2 border-[#00F3FF] hover:border-[#00FF66] hover:text-[#00FF66] transform active:scale-95 transition-all uppercase shadow-[0_0_15px_rgba(0,243,255,0.2)]">
                             <Rocket className="w-8 h-8" />
                         </button>
                         <button 
+                            onPointerDown={() => pressKey(' ')} 
+                            onPointerUp={() => releaseKey(' ')} 
+                            className="w-16 h-16 flex items-center justify-center bg-black/70 rounded-none text-[#00FF66] backdrop-blur-md hover:border-[#00F3FF] hover:text-[#00F3FF] border-2 border-[#00FF66] transform active:scale-95 transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)]">
+                            <Flame className="w-8 h-8" />
+                        </button>
+                        <button 
                             onClick={toggleLanding} 
-                            className={`w-16 h-16 flex items-center justify-center rounded-full text-white backdrop-blur shadow-lg border-2 transform active:scale-95 transition-all ${isLanded ? 'bg-orange-600/80 border-orange-400 shadow-[0_0_20px_rgba(255,165,0,0.5)]' : 'bg-green-600/80 border-green-400 shadow-[0_0_20px_rgba(0,255,0,0.5)]'}`}>
+                            className={`w-16 h-16 flex items-center justify-center bg-black/70 rounded-none backdrop-blur-md border-2 transform active:scale-95 transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)] ${isLanded ? 'text-orange-400 border-orange-400' : 'text-gray-400 border-gray-600'}`}>
                             {isLanded ? <PlaneTakeoff className="w-8 h-8" /> : <PlaneLanding className="w-8 h-8" />}
                         </button>
                     </div>
                 </div>
-
-                <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex gap-4">
-                    <button 
-                        onClick={() => setIsZoomed(!isZoomed)}
-                        className={`w-12 h-12 flex items-center justify-center rounded-full text-white backdrop-blur shadow-[0_0_15px_rgba(0,243,255,0.5)] border-2 transition-all duration-300 ${isZoomed ? 'bg-indigo-600/80 border-indigo-400 scale-110' : 'bg-cyan-600/80 border-cyan-400'}`}>
-                        <Search className="w-6 h-6" />
-                    </button>
-                </div>
-                
-                {isLanded && (
-                    <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-4 items-start">
-                        <button 
-                            onClick={exitAircraft}
-                            className="px-6 py-3 bg-[#0D0E10]/90 rounded-lg text-[#00F3FF] font-bold font-mono backdrop-blur border-2 border-[#00F3FF] shadow-[0_0_15px_rgba(0,243,255,0.5)] flex items-center gap-2 transform active:scale-95 transition-all">
-                            <LogOut className="w-5 h-5" />
-                            {allUniforms['slider_pilot'] > 0.5 ? 'ENTER AIRCRAFT' : 'EXIT AIRCRAFT'}
-                        </button>
-                    </div>
-                )}
                 </>
             )}
         </div>
