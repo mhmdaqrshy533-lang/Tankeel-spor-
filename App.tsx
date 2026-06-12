@@ -245,7 +245,7 @@ const AppContent: React.FC = () => {
                     {(appPhase === 'GAME' || appPhase === 'HOME') && <ShipOverlay />}
                     {(appPhase === 'GAME' || appPhase === 'HOME') && (
                         <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%+4rem)] pointer-events-none opacity-40 mix-blend-color-dodge transition-all duration-500 ${isZoomed ? 'scale-75' : ''}`}>
-                            <span className="text-[#00F3FF] tracking-[1em] font-mono font-bold text-lg" style={{textShadow: '0 0 10px #00F3FF', perspective: '1000px', transform: 'rotateX(45deg)'}}>STARFIRE</span>
+                            <span className="text-[#00F3FF] tracking-[1em] font-mono font-bold text-lg" style={{textShadow: '0 0 10px #00F3FF', perspective: '1000px', transform: 'rotateX(45deg)'}}>SGRD</span>
                         </div>
                     )}
                 </div>
